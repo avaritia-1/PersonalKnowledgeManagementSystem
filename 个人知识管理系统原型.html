@@ -1,0 +1,746 @@
+
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>智识云 - 学生知识管理系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/iconify-icon/2.0.0/iconify-icon.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<style>
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    
+    #knowledge-graph {
+      height: 680px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body class="bg-blue-50 min-h-screen flex flex-col">
+<!-- 顶部导航区域 -->
+<nav class="bg-white py-3 px-6 flex items-center justify-between border-b border-blue-100">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+<iconify-icon class="text-white text-xl" icon="mdi:brain"></iconify-icon>
+</div>
+<h1 class="text-gray-800 font-bold text-2xl">智识云</h1>
+</div>
+<div class="relative w-1/3">
+<input class="w-full py-2 px-4 bg-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="搜索文档、知识点..." type="text"/>
+<iconify-icon class="absolute right-3 top-2.5 text-gray-500" icon="mdi:magnify"></iconify-icon>
+</div>
+<div class="flex items-center space-x-4">
+<div class="relative">
+<iconify-icon class="text-gray-600 text-2xl" icon="mdi:bell-outline"></iconify-icon>
+<div class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
+</div>
+<div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
+<img alt="User profile avatar" id="1" src="https://modao.cc/agent-py/workspace/6922baf94d34c71c766ec026/generated_images/07a7325f882c4888b19d25c36ade27b5.jpg"/>
+</div>
+<span class="text-gray-700 font-medium">李晓明</span>
+</div>
+</nav>
+<!-- 主内容区域 -->
+<div class="flex flex-1">
+<!-- 侧边导航栏 -->
+<aside class="bg-white w-64 py-4 border-r border-blue-100">
+<nav class="space-y-1 px-2">
+<button class="nav-item flex items-center space-x-3 p-3 rounded-lg text-blue-600 hover:bg-blue-50 font-medium bg-blue-50" data-view="dashboard">
+<iconify-icon class="text-xl" icon="mdi:view-dashboard"></iconify-icon>
+<span>学习概览</span>
+</button>
+<button class="nav-item flex items-center space-x-3 p-3 rounded-lg text-gray-700 hover:bg-blue-50" data-view="documents">
+<iconify-icon class="text-xl" icon="mdi:file-document-multiple"></iconify-icon>
+<span>文档管理</span>
+</button>
+<button class="nav-item flex items-center space-x-3 p-3 rounded-lg text-gray-700 hover:bg-blue-50" data-view="knowledge-graph">
+<iconify-icon class="text-xl" icon="mdi:graph"></iconify-icon>
+<span>知识图谱</span>
+</button>
+<button class="nav-item flex items-center space-x-3 p-3 rounded-lg text-gray-700 hover:bg-blue-50" data-view="analytics">
+<iconify-icon class="text-xl" icon="mdi:chart-box"></iconify-icon>
+<span>学习分析</span>
+</button>
+<button class="nav-item flex items-center space-x-3 p-3 rounded-lg text-gray-700 hover:bg-blue-50" data-view="assistant">
+<iconify-icon class="text-xl" icon="mdi:robot"></iconify-icon>
+<span>AI助手</span>
+</button>
+<div class="pt-10 px-3">
+<button class="flex items-center space-x-3 p-3 rounded-lg text-gray-700 hover:bg-blue-50 w-full text-left">
+<iconify-icon class="text-xl" icon="mdi:cog"></iconify-icon>
+<span>系统设置</span>
+</button>
+</div>
+</nav>
+</aside>
+<!-- 主内容区域 -->
+<main class="flex-1 p-6 overflow-auto hide-scrollbar">
+<!-- 学习概览面板 -->
+<div class="space-y-6" id="dashboard-view">
+<h2 class="text-2xl font-bold text-gray-800 mb-4">学习概览</h2>
+<!-- 学习数据概览 -->
+<div class="grid grid-cols-4 gap-6">
+<div class="bg-white rounded-xl shadow p-5 border border-blue-100">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-gray-600 mb-1">今日学习</p>
+<p class="text-2xl font-bold">1.4小时</p>
+</div>
+<div class="p-2 bg-blue-50 rounded-lg">
+<iconify-icon class="text-blue-600 text-xl" icon="mdi:clock-time-three"></iconify-icon>
+</div>
+</div>
+<div class="mt-3 flex items-center text-green-600">
+<iconify-icon icon="mdi:trending-up"></iconify-icon>
+<span class="ml-1">+12%</span>
+</div>
+</div>
+<div class="bg-white rounded-xl shadow p-5 border border-blue-100">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-gray-600 mb-1">已学习文档</p>
+<p class="text-2xl font-bold">42</p>
+</div>
+<div class="p-2 bg-green-50 rounded-lg">
+<iconify-icon class="text-green-500 text-xl" icon="mdi:file-check"></iconify-icon>
+</div>
+</div>
+<div class="mt-3 flex items-center">
+<div class="w-full bg-gray-200 rounded-full h-2">
+<div class="bg-green-500 h-2 rounded-full" style="width: 65%"></div>
+</div>
+<span class="ml-2 text-gray-600 text-sm">65%</span>
+</div>
+</div>
+<div class="bg-white rounded-xl shadow p-5 border border-blue-100">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-gray-600 mb-1">知识点掌握</p>
+<p class="text-2xl font-bold">78</p>
+</div>
+<div class="p-2 bg-yellow-50 rounded-lg">
+<iconify-icon class="text-yellow-500 text-xl" icon="mdi:lightbulb-on"></iconify-icon>
+</div>
+</div>
+<div class="mt-3 flex items-center text-green-600">
+<iconify-icon icon="mdi:trending-up"></iconify-icon>
+<span class="ml-1">+15%</span>
+</div>
+</div>
+<div class="bg-white rounded-xl shadow p-5 border border-blue-100">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-gray-600 mb-1">待复习内容</p>
+<p class="text-2xl font-bold">8</p>
+</div>
+<div class="p-2 bg-orange-50 rounded-lg">
+<iconify-icon class="text-orange-500 text-xl" icon="mdi:clipboard-alert"></iconify-icon>
+</div>
+</div>
+<div class="mt-3 flex items-center">
+<div class="text-gray-600 text-sm">明日需复习3个知识点</div>
+</div>
+</div>
+</div>
+<!-- 学习路径推荐 -->
+<div class="bg-white rounded-xl shadow p-5 border border-blue-100 mt-6">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-xl font-bold text-gray-800">推荐学习路径</h3>
+<button class="text-blue-600 flex items-center hover:text-blue-700">
+<span>查看全部分析</span>
+<iconify-icon class="ml-1" icon="mdi:chevron-right"></iconify-icon>
+</button>
+</div>
+<div class="bg-blue-50 p-4 rounded-lg mb-4">
+<div class="flex items-center">
+<div class="bg-white w-10 h-10 rounded-full flex items-center justify-center border border-blue-200 mr-3">
+<iconify-icon class="text-blue-600" icon="mdi:book"></iconify-icon>
+</div>
+<div>
+<p class="font-medium">线性代数</p>
+<p class="text-sm text-gray-600">基础概念 → 矩阵运算 → 特征值与特征向量</p>
+</div>
+<div class="ml-auto">
+<span class="text-xs bg-blue-500 text-white py-1 px-2 rounded-full">建议优先学习</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<div class="bg-blue-50 p-3 rounded-lg">
+<div class="flex items-center mb-1">
+<span class="font-medium">机器学习基础</span>
+<span class="ml-auto text-xs text-green-600">25% 完成</span>
+</div>
+<div class="w-full bg-gray-200 rounded-full h-1.5">
+<div class="bg-blue-500 h-1.5 rounded-full" style="width: 25%"></div>
+</div>
+</div>
+<div class="bg-blue-50 p-3 rounded-lg">
+<div class="flex items-center mb-1">
+<span class="font-medium">Python数据分析</span>
+<span class="ml-auto text-xs text-green-600">78% 完成</span>
+</div>
+<div class="w-full bg-gray-200 rounded-full h-1.5">
+<div class="bg-green-500 h-1.5 rounded-full" style="width: 78%"></div>
+</div>
+</div>
+<div class="bg-blue-50 p-3 rounded-lg">
+<div class="flex items-center mb-1">
+<span class="font-medium">深度学习</span>
+<span class="ml-auto text-xs text-yellow-600">待开始</span>
+</div>
+<div class="w-full bg-gray-200 rounded-full h-1.5">
+<div class="bg-gray-300 h-1.5 rounded-full" style="width: 0%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- 近期上传 -->
+<div class="bg-white rounded-xl shadow p-5 border border-blue-100 mt-6">
+<h3 class="text-xl font-bold text-gray-800 mb-4">近期上传文档</h3>
+<div class="grid grid-cols-4 gap-4">
+<div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+<img alt="Recent document: Linear algebra lecture notes" class="w-full h-32 object-cover" id="2" src="https://modao.cc/agent-py/workspace/6922baf94d34c71c766ec026/generated_images/cb7f54361a6d47858f09fc8d5660765e.jpg"/>
+<div class="p-3">
+<h4 class="font-medium mb-1">线性代数笔记</h4>
+<p class="text-sm text-gray-500 mb-2">数学基础</p>
+<div class="flex justify-between text-xs">
+<span class="text-gray-500">PDF 文件</span>
+<span>2025-11-20</span>
+</div>
+</div>
+</div>
+<div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+<img alt="Recent document: Python data analysis" class="w-full h-32 object-cover" id="3" src="https://modao.cc/agent-py/workspace/6922baf94d34c71c766ec026/generated_images/479bcb1181b04442a2c906846b4dc4af.jpg"/>
+<div class="p-3">
+<h4 class="font-medium mb-1">Python数据分析</h4>
+<p class="text-sm text-gray-500 mb-2">编程语言</p>
+<div class="flex justify-between text-xs">
+<span class="text-gray-500">DOCX 文件</span>
+<span>2025-11-18</span>
+</div>
+</div>
+</div>
+<div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+<img alt="Recent document: Machine learning algorithms" class="w-full h-32 object-cover" id="4" src="https://modao.cc/agent-py/workspace/6922baf94d34c71c766ec026/generated_images/65000432360d4021a412a38496ff43c3.jpg"/>
+<div class="p-3">
+<h4 class="font-medium mb-1">机器学习算法</h4>
+<p class="text-sm text-gray-500 mb-2">AI技术</p>
+<div class="flex justify-between text-xs">
+<span class="text-gray-500">PDF 文件</span>
+<span>2025-11-15</span>
+</div>
+</div>
+</div>
+<div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+<img alt="Recent document: Neural networks guide" class="w-full h-32 object-cover" id="5" src="https://modao.cc/agent-py/workspace/6922baf94d34c71c766ec026/generated_images/f9507c2165b04265abbf39553a37723f.jpg"/>
+<div class="p-3">
+<h4 class="font-medium mb-1">神经网络入门</h4>
+<p class="text-sm text-gray-500 mb-2">深度学习</p>
+<div class="flex justify-between text-xs">
+<span class="text-gray-500">PPT 文件</span>
+<span>2025-11-10</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 文档管理面板 -->
+<div class="hidden space-y-6" id="documents-view">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-2xl font-bold text-gray-800">文档管理</h2>
+<button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center">
+<iconify-icon class="mr-2" icon="mdi:plus"></iconify-icon>
+            添加文档
+          </button>
+</div>
+<!-- 筛选工具栏 -->
+<div class="bg-white p-4 rounded-xl shadow border border-blue-100 flex items-center justify-between">
+<div class="flex space-x-3">
+<div class="relative">
+<select class="bg-gray-100 py-2 pl-4 pr-10 rounded-lg appearance-none">
+<option>所有类别</option>
+<option>数学笔记</option>
+<option>编程资料</option>
+<option>科研论文</option>
+<option>书籍摘要</option>
+</select>
+<iconify-icon class="absolute right-3 top-2.5 text-gray-500 pointer-events-none" icon="mdi:chevron-down"></iconify-icon>
+</div>
+<div class="relative">
+<select class="bg-gray-100 py-2 pl-4 pr-10 rounded-lg appearance-none">
+<option>所有状态</option>
+<option>已学习</option>
+<option>学习中</option>
+<option>待学习</option>
+</select>
+<iconify-icon class="absolute right-3 top-2.5 text-gray-500 pointer-events-none" icon="mdi:chevron-down"></iconify-icon>
+</div>
+<button class="bg-gray-100 hover:bg-gray-200 rounded-lg py-2 px-4 flex items-center">
+<iconify-icon class="mr-2" icon="mdi:sort"></iconify-icon>
+<span>排序</span>
+</button>
+</div>
+<div class="flex space-x-2">
+<button class="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg">
+<iconify-icon class="text-xl" icon="mdi:view-module"></iconify-icon>
+</button>
+<button class="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg">
+<iconify-icon class="text-xl" icon="mdi:view-list"></iconify-icon>
+</button>
+</div>
+</div>
+<!-- 文档列表 -->
+<div class="grid grid-cols-4 gap-6">
+<!-- 文档卡片 -->
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<img alt="Document: Calculus fundamentals" class="w-full h-40 object-cover" id="6" src="https://modao.cc/agent-py/workspace/6922baf94d34c71c766ec026/generated_images/16369355d26a49208685896391e71fdd.jpg"/>
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-gray-800 text-lg">微积分基础</h3>
+<span class="text-xs bg-blue-100 text-blue-800 py-0.5 px-2 rounded-full">数学</span>
+</div>
+<p class="text-gray-600 text-sm mb-4">
+                微分方程、积分变换和多重积分的概念与应用
+              </p>
+<div class="flex items-center justify-between mt-4">
+<span class="text-xs text-gray-500">PDF · 2.4MB</span>
+<div class="text-xs text-green-600 flex items-center">
+<span>已学习</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<img alt="Document: Statistics and probability" class="w-full h-40 object-cover" id="7" src="https://modao.cc/agent-py/workspace/6922baf94d34c71c766ec026/generated_images/f6bddb8a01a74d09a7061d2106f10631.jpg"/>
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-gray-800 text-lg">概率与统计</h3>
+<span class="text-xs bg-blue-100 text-blue-800 py-0.5 px-2 rounded-full">数学</span>
+</div>
+<p class="text-gray-600 text-sm mb-4">
+                从基础概念到假设检验的完整统计学习资料
+              </p>
+<div class="flex items-center justify-between mt-4">
+<span class="text-xs text-gray-500">DOCX · 3.8MB</span>
+<div class="text-xs text-yellow-600 flex items-center">
+<span>学习中</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<img alt="Document: Python for Machine Learning" class="w-full h-40 object-cover" id="8" src="https://modao.cc/agent-py/workspace/6922baf94d34c71c766ec026/generated_images/67adc1bb2ecf42e583419c9aa6f7e426.jpg"/>
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-gray-800 text-lg">Python机器学习</h3>
+<span class="text-xs bg-green-100 text-green-800 py-0.5 px-2 rounded-full">编程</span>
+</div>
+<p class="text-gray-600 text-sm mb-4">
+                使用Python实现常用机器学习算法实践指南
+              </p>
+<div class="flex items-center justify-between mt-4">
+<span class="text-xs text-gray-500">PDF · 4.1MB</span>
+<div class="text-xs text-blue-600 flex items-center">
+<span>待学习</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<img alt="Document: Deep Learning Research" class="w-full h-40 object-cover" id="9" src="https://modao.cc/agent-py/workspace/6922baf94d34c71c766ec026/generated_images/e483340651fc4df0a9db89bbce42f0e4.jpg"/>
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-gray-800 text-lg">深度学习研究</h3>
+<span class="text-xs bg-purple-100 text-purple-800 py-0.5 px-2 rounded-full">AI</span>
+</div>
+<p class="text-gray-600 text-sm mb-4">
+                前沿神经网络结构与训练方法论文集
+              </p>
+<div class="flex items-center justify-between mt-4">
+<span class="text-xs text-gray-500">PDF · 6.2MB</span>
+<div class="text-xs text-blue-600 flex items-center">
+<span>待学习</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 知识图谱面板 -->
+<div class="hidden" id="knowledge-graph-view">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-2xl font-bold text-gray-800">知识图谱</h2>
+<div class="flex space-x-3">
+<button class="flex items-center bg-white border border-gray-200 rounded-lg py-2 px-4 hover:bg-gray-50">
+<iconify-icon class="mr-2" icon="mdi:filter"></iconify-icon>
+<span>筛选</span>
+</button>
+<button class="flex items-center bg-white border border-gray-200 rounded-lg py-2 px-4 hover:bg-gray-50">
+<iconify-icon class="mr-2" icon="mdi:focus-field-horizontal"></iconify-icon>
+<span>聚焦模式</span>
+</button>
+<button class="flex items-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
+<iconify-icon class="mr-2" icon="mdi:plus"></iconify-icon>
+<span>创建关联</span>
+</button>
+</div>
+</div>
+<div class="bg-white rounded-xl shadow p-5 border border-blue-100">
+<div class="flex gap-6">
+<!-- 图谱区域 -->
+<div class="flex-1">
+<div class="bg-gray-50 rounded-lg border border-gray-200" id="knowledge-graph">
+<!-- ECharts图表将在此渲染 -->
+</div>
+</div>
+<!-- 知识点详情 -->
+<div class="w-80 bg-gray-50 rounded-lg border border-gray-200 p-4">
+<h3 class="text-lg font-bold mb-4 text-center">知识点详情</h3>
+<div class="bg-white rounded-lg shadow-sm p-4">
+<h4 class="font-bold text-gray-800 text-center mb-3">深度学习</h4>
+<p class="text-gray-600 text-sm mb-4">
+                  一种基于神经网络的机器学习方法，能够处理大量数据并学习数据的复杂模式。
+                </p>
+<div class="grid grid-cols-2 gap-3 mb-4">
+<div class="text-center">
+<p class="text-2xl font-bold text-blue-600">87</p>
+<p class="text-xs text-gray-500">关联知识点</p>
+</div>
+<div class="text-center">
+<p class="text-2xl font-bold text-green-600">42</p>
+<p class="text-xs text-gray-500">相关文档</p>
+</div>
+</div>
+<div class="mb-3">
+<p class="font-medium text-sm mb-1">掌握状态</p>
+<div class="flex items-center">
+<div class="flex-1 bg-gray-200 rounded-full h-2">
+<div class="bg-yellow-500 h-2 rounded-full" style="width: 45%"></div>
+</div>
+<span class="ml-2 text-xs text-gray-600">45%</span>
+</div>
+</div>
+<div>
+<p class="font-medium text-sm mb-1">相关标签</p>
+<div class="flex flex-wrap gap-2">
+<span class="bg-blue-100 text-blue-800 text-xs py-0.5 px-2 rounded-full">机器学习</span>
+<span class="bg-blue-100 text-blue-800 text-xs py-0.5 px-2 rounded-full">神经网络</span>
+<span class="bg-blue-100 text-blue-800 text-xs py-0.5 px-2 rounded-full">计算机视觉</span>
+<span class="bg-blue-100 text-blue-800 text-xs py-0.5 px-2 rounded-full">自然语言处理</span>
+</div>
+</div>
+</div>
+<div class="mt-4">
+<p class="font-medium text-sm mb-2">相关概念</p>
+<div class="space-y-2">
+<div class="bg-white rounded p-2 flex items-center border border-gray-100">
+<div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+<span>神经网络</span>
+<span class="ml-auto text-xs text-gray-500">12关联</span>
+</div>
+<div class="bg-white rounded p-2 flex items-center border border-gray-100">
+<div class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+<span>强化学习</span>
+<span class="ml-auto text-xs text-gray-500">8关联</span>
+</div>
+<div class="bg-white rounded p-2 flex items-center border border-gray-100">
+<div class="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+<span>卷积网络</span>
+<span class="ml-auto text-xs text-gray-500">10关联</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 学习分析面板 -->
+<div class="hidden" id="analytics-view">
+<h2 class="text-2xl font-bold text-gray-800 mb-6">学习分析</h2>
+<div class="grid grid-cols-3 gap-6 mb-6">
+<!-- 学习时长统计 -->
+<div class="bg-white rounded-xl shadow p-5 border border-blue-100 col-span-2">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-lg font-bold">每周学习时长统计</h3>
+<div class="flex space-x-2">
+<button class="text-xs bg-blue-100 hover:bg-blue-200 rounded px-2 py-1">本周</button>
+<button class="text-xs bg-gray-100 hover:bg-gray-200 rounded px-2 py-1">本月</button>
+<button class="text-xs bg-gray-100 hover:bg-gray-200 rounded px-2 py-1">本季</button>
+</div>
+</div>
+<div class="h-64" id="study-time-chart"></div>
+</div>
+<!-- 知识点掌握分析 -->
+<div class="bg-white rounded-xl shadow p-5 border border-blue-100">
+<h3 class="text-lg font-bold mb-4">知识点掌握分布</h3>
+<div class="h-64" id="knowledge-level-chart"></div>
+</div>
+</div>
+<!-- 进度预测和建议 -->
+<div class="bg-white rounded-xl shadow p-5 border border-blue-100">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-lg font-bold">学习进展预测</h3>
+<button class="text-blue-600 flex items-center hover:text-blue-700 text-sm">
+<iconify-icon class="mr-1" icon="mdi:refresh"></iconify-icon>
+              重新生成预测
+            </button>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<div class="bg-blue-50 rounded-lg p-4">
+<div class="flex items-center mb-2">
+<p class="font-medium">当前进度</p>
+<span class="ml-auto text-2xl font-bold text-blue-600">42%</span>
+</div>
+<div class="w-full bg-gray-200 rounded-full h-2">
+<div class="bg-blue-500 h-2 rounded-full" style="width: 42%"></div>
+</div>
+</div>
+<div class="bg-green-50 rounded-lg p-4">
+<div class="flex items-center mb-2">
+<p class="font-medium">预测完成时间</p>
+<span class="ml-auto text-2xl font-bold text-green-600">3.2周</span>
+</div>
+<p class="text-xs text-gray-600">基于当前学习速率预测</p>
+</div>
+<div class="bg-yellow-50 rounded-lg p-4">
+<div class="flex items-center mb-2">
+<p class="font-medium">建议学习时长</p>
+<span class="ml-auto text-2xl font-bold text-yellow-600">2小时/天</span>
+</div>
+<p class="text-xs text-gray-600">完成目标的建议节奏</p>
+</div>
+</div>
+<div class="mt-6">
+<h4 class="font-medium text-gray-800 mb-2">优化建议</h4>
+<ul class="space-y-2 text-sm">
+<li class="flex">
+<iconify-icon class="text-green-500 mr-2" icon="mdi:check-circle"></iconify-icon>
+<span>增加机器学习相关文档的学习频次</span>
+</li>
+<li class="flex">
+<iconify-icon class="text-green-500 mr-2" icon="mdi:check-circle"></iconify-icon>
+<span>每周三晚上专注数学概念学习效率最高</span>
+</li>
+<li class="flex">
+<iconify-icon class="text-green-500 mr-2" icon="mdi:check-circle"></iconify-icon>
+<span>建立更多神经网络与数学概念的关联</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+    // 视图切换功能
+    document.addEventListener('DOMContentLoaded', function() {
+      // 切换视图
+      const navItems = document.querySelectorAll('.nav-item');
+      const views = document.querySelectorAll('main > div');
+      
+      navItems.forEach(item => {
+        item.addEventListener('click', function() {
+          const viewId = this.getAttribute('data-view') + '-view';
+          
+          // 更新导航项状态
+          navItems.forEach(nav => nav.classList.remove('bg-blue-50', 'text-blue-600', 'font-medium'));
+          this.classList.add('bg-blue-50', 'text-blue-600', 'font-medium');
+          
+          // 显示对应视图
+          views.forEach(view => view.classList.add('hidden'));
+          document.getElementById(viewId).classList.remove('hidden');
+        });
+      });
+      
+      // 默认激活学习概览
+      document.querySelector('.nav-item[data-view="dashboard"]').click();
+      
+      // ECharts知识图初始化
+      const graphChart = echarts.init(document.getElementById('knowledge-graph'));
+      const graphOption = {
+        tooltip: {},
+        legend: {
+          data: ['数学', '编程', '机器学习', '深度学习']
+        },
+        series: [{
+          name: '知识图谱',
+          type: 'graph',
+          layout: 'force',
+          emphasis: {
+            focus: 'adjacency',
+            label: {
+              show: true
+            }
+          },
+          draggable: true,
+          roam: true,
+          categories: [
+            { name: '数学' },
+            { name: '编程' },
+            { name: '机器学习' },
+            { name: '深度学习' }
+          ],
+          data: [
+            {name: '向量', category: 0, symbolSize: 20},
+            {name: '矩阵', category: 0, symbolSize: 22},
+            {name: '导数', category: 0, symbolSize: 18},
+            {name: '积分', category: 0, symbolSize: 18},
+            {name: 'Python', category: 1, symbolSize: 25},
+            {name: 'Numpy', category: 1, symbolSize: 22},
+            {name: 'Pandas', category: 1, symbolSize: 20},
+            {name: '回归分析', category: 2, symbolSize: 24},
+            {name: '分类算法', category: 2, symbolSize: 22},
+            {name: '聚类算法', category: 2, symbolSize: 20},
+            {name: '神经网络', category: 3, symbolSize: 28},
+            {name: 'CNN', category: 3, symbolSize: 26},
+            {name: 'RNN', category: 3, symbolSize: 24},
+            {name: 'Transformer', category: 3, symbolSize: 22}
+          ],
+          links: [
+            {source: '矩阵', target: '向量'},
+            {source: '积分', target: '导数'},
+            {source: 'Python', target: 'Numpy'},
+            {source: 'Python', target: 'Pandas'},
+            {source: '回归分析', target: '矩阵'},
+            {source: '聚类算法', target: '向量'},
+            {source: '神经网络', target: '矩阵'},
+            {source: 'CNN', target: '神经网络'},
+            {source: 'RNN', target: '神经网络'},
+            {source: 'Transformer', target: '神经网络'},
+            {source: '分类算法', target: 'Python'},
+            {source: '回归分析', target: 'Python'}
+          ],
+          lineStyle: {
+            width: 1,
+            color: 'source',
+            curveness: 0.1
+          },
+          label: {
+            show: true,
+            position: 'inside',
+            fontSize: 12
+          }
+        }]
+      };
+      graphChart.setOption(graphOption);
+      
+      // ECharts学习时间图表
+      const timeChart = echarts.init(document.getElementById('study-time-chart'));
+      const timeOption = {
+        tooltip: {
+          trigger: 'axis'
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+        },
+        yAxis: {
+          type: 'value',
+          name: '小时'
+        },
+        series: [
+          {
+            name: '学习时长',
+            type: 'bar',
+            barWidth: '40%',
+            data: [1.2, 0.8, 1.8, 1.0, 1.5, 2.3, 1.4],
+            itemStyle: {
+              color: '#2B6CB0'
+            }
+          },
+          {
+            name: '平均时长',
+            type: 'line',
+            data: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            symbol: 'none',
+            lineStyle: {
+              color: '#F6AD55'
+            }
+          }
+        ]
+      };
+      timeChart.setOption(timeOption);
+      
+      // ECharts知识点掌握图表
+      const levelChart = echarts.init(document.getElementById('knowledge-level-chart'));
+      const levelOption = {
+        tooltip: {
+          formatter: '{a} <br/>{b} : {c}%'
+        },
+        series: [
+          {
+            name: '掌握程度',
+            type: 'gauge',
+            radius: '80%',
+            progress: {
+              show: true,
+              width: 18
+            },
+            axisLine: {
+              lineStyle: {
+                width: 18
+              }
+            },
+            axisLabel: {
+              distance: -20,
+              fontSize: 12
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              length: 8,
+              lineStyle: {
+                width: 2,
+                color: '#999'
+              }
+            },
+            pointer: {
+              show: true
+            },
+            data: [
+              {
+                value: 65,
+                name: '机器学习'
+              }
+            ],
+            title: {
+              offsetCenter: [0, '50%']
+            },
+            detail: {
+              valueAnimation: true,
+              formatter: '{value}%',
+              offsetCenter: [0, '80%'],
+              fontSize: 20
+            }
+          }
+        ]
+      };
+      levelChart.setOption(levelOption);
+      
+      // 响应窗口大小变化
+      window.addEventListener('resize', function() {
+        graphChart.resize();
+        timeChart.resize();
+        levelChart.resize();
+      });
+    });
+  </script>
+</body>
+</html>
